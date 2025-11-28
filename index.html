@@ -121,7 +121,7 @@
                 return;
             }
             urlsList.innerHTML = urls
-                .map(url => `<div class="url-item" onclick="copyToClipboard('${url}')">${url}</div>`)
+                .map(url => `<div class="url-item"><a href="${url}">${url}</a></div>`)
                 .join('');
         }
         
