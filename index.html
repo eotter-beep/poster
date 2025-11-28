@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<head>
+    <title>Poster - Reliable, Free, Open</title>
+</head>
+<body>
+    <style>
+        /* Import Jetbrains Mono */
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+        /* Certain browsers doesn't support local font families, so lets import alternative fonts in Google fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+        h1 {
+            font-family: 'Roboto', sans-serif;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: white;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .disclaimer {
+            color: red;
+        }
+        .search-container {
+            margin: 20px 0;
+            width: 100%;
+            max-width: 500px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .urls-list {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .url-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .url-item:hover {
+            background-color: #f5f5f5;
+        }
+        .url-item:last-child {
+            border-bottom: none;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+        .no-results {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+    </style>
+    <h1>Poster</h1>
+    <p>Fast, reliable, open source, free data you deserve.</p>
+    <p>Whether your <code>coding</code>, cooking, or crafting, Poster has you covered.</p>
+    
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search URLs..." id="searchInput">
+        <div class="urls-list" id="urlsList"></div>
+    </div>
+    
+    <h1>FAQs</h1>
+    <span>
+        <h2>How can I create my own Poster server?</h2>
+        <p class="disclaimer">Creating a server is simple, but often requires wait time because you submit a Issue on our GitHub page.</p>
+        <p>1. Create a github repository</p>
+        <p>2. Create your own web page</p>
+        <p>3. Deploy your web page in GitHub Pages (thats required or else we will reject your request)</p>
+        <p>4. Submit a Issue on our GitHub page</p>
+        <p>5. Wait for us to review your request</p>
+        <p>6. Once approved, your data will be available in Poster.</p>
+        <p class="disclaimer">Your code must be open source, and have a link to code, or else we will also reject your request.</p>
+    </span>
+    
+    <script>
+        let allUrls = ['https://api.github.com/repos/eotter‑beep/mercury‑vcs/contents'];
+        const searchInput = document.getElementById('searchInput');
+        const urlsList = document.getElementById('urlsList');
+        
+        // Fetch URLs on page load
+        async function fetchUrls() {
+            urlsList.innerHTML = '<div class="loading">Loading URLs...</div>';
+            try {
+                // Replace with your actual API endpoint or data source
+                const response = await fetch('/api/urls'); // Update with your endpoint
+                if (!response.ok) throw new Error('Failed to fetch URLs');
+                allUrls = await response.json();
+                renderUrls(allUrls);
+            } catch (error) {
+                urlsList.innerHTML = `<div class="no-results">No results found!</div>`;
+                console.error('Error fetching URLs:', error);
+            }
+        }
+        
+        // Render URLs to the list
+        function renderUrls(urls) {
+            if (urls.length === 0) {
+                urlsList.innerHTML = '<div class="no-results">No URLs found</div>';
+                return;
+            }
+            urlsList.innerHTML = urls
+                .map(url => `<div class="url-item" onclick="copyToClipboard('${url}')">${url}</div>`)
+                .join('');
+        }
+        
+        // Filter URLs based on search input
+        function filterUrls(query) {
+            const filtered = allUrls.filter(url =>
+                url.toLowerCase().includes(query.toLowerCase())
+            );
+            renderUrls(filtered);
+        }
+        
+        // Copy URL to clipboard
+        function copyToClipboard(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Copied: ' + url);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+        
+        // Event listener for search input
+        searchInput.addEventListener('input', (e) => {
+            filterUrls(e.target.value);
+        });
+        
+        // Load URLs when page loads
+        document.addEventListener('DOMContentLoaded', fetchUrls);
+    </script>
+</body>
